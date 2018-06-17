@@ -1,0 +1,21 @@
+#The playbook will install tomcat copying from the ansible host machine
+#install tomcat in the hosts and deploy the webapplication and start tomcat server with catlina file
+---
+- name: Install Tomcat
+  hosts: webservers
+  vars:
+     HOME: /home/vagrant/ansible_workspace
+     TOMCAT_VERSION: apache-tomcat-7.0.88.tar.gz
+     TOMCAT_NAME: apache-tomcat-7.0.88
+  tasks:
+    - name: Copy Tomcat tar file
+      copy: src=/home/vagrant/softwares/{{TOMCAT_VERSION}} dest={{HOME}}
+    - name: Extract tar.gz archive
+      unarchive: src={{HOME}}/{{TOMCAT_VERSION}} dest={{HOME}} remote_src=yes
+    - name: Copy modified startup.sh file
+      copy: src=/home/vagrant/softwares/startup.sh dest={{HOME}}/{{TOMCAT_NAME}}/bin
+    - name: deploy artifacts to webserver
+      copy: src=<path to war file>project.war dest={{HOME}}/{{TOMCAT_NAME}}/webapps/project.war
+    - name: start tomcat
+      command: "nohup /{{HOME}}/{{TOMCAT_NAME}}/bin/startup.sh"
+      tags: startTomcat
